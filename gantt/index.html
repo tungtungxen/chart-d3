@@ -1,0 +1,170 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<script src="d3.v5.min.js"></script>
+	<script src="gantt-chart-d3.js"></script>
+	<script src="jquery-1.12.4.min.js"></script>
+	<style type="text/css">
+		.gantt-chart-d3 {
+			width: 1000px;
+		}
+		.gantt-chart-d3 {
+			overflow-x: scroll;
+		}
+		.gantt-chart-d3 rect {
+			mix-blend-mode: multiply;
+		}
+		.gantt-chart-d3 .domain {
+			stroke-width: 0;
+		}
+		.gantt-chart-d3 .x-grid .tick>line {
+			stroke: #e0e0e0;
+			stroke-width: 0.2;
+		}
+		.gantt-chart-d3 .x-grid .tick:nth-of-type(1)>line {
+			stroke-width: 0;
+		}
+		.gantt-chart-d3 .y-grid rect {
+			fill: #ffffff;
+		}
+		.gantt-chart-d3 .y-grid rect:nth-child(even) {
+			fill: #f5f5f5;
+		}
+		.gantt-chart-d3 .x-axis .tick text {
+			font-size: 12px;
+			fill: #333333;
+			font-family: "Noto Sans JP", sans-serif;
+		}
+		.gantt-chart-d3 .g-chart {
+			cursor: pointer;
+		}
+		.gantt-chart-d3 .g-chart text {
+			fill: #ffffff;
+			font-size: 12px;
+		}
+	</style>
+
+
+</head>
+<body>
+
+<div class="p-timeline">
+	<div class="p-timeline__actions">
+		<div class="p-timeline__action">
+			<ul class="p-timeline__btns">
+				<li class="p-timeline__tab is-active">
+					<span class="p-timeline__tab--cate">click me(year)</span>
+				</li>
+				<li class="p-timeline__tab">
+					<span class="p-timeline__tab--cate">click me (age)</span>
+				</li>
+			</ul>
+		</div>
+	</div>
+	<div class="p-timeline__charts">
+		<div id="" class="p-timeline__chart  is-show gantt-chart-d3"> </div>
+	</div>
+</div>
+
+<script type="text/javascript">
+
+	var tasks = [
+	{
+	"id": "achievement_1",
+	"name": "title 2",
+	"startDate": "2014-02-01",
+	"endDate": "2015-02-01",
+	"progress": 100,
+	"custom_class": "is-achievement",
+	"key": 2,
+	"taskName": 4
+	},
+	{
+	"id": "achievement_2",
+	"name": "title 3",
+	"startDate": "2011-02-01",
+	"endDate": "2015-02-01",
+	"progress": 100,
+	"custom_class": "is-achievement",
+	"key": 3,
+	"taskName": 2
+	},
+	{
+	"id": "achievement_3",
+	"name": "title 4",
+	"startDate": "2012-02-01",
+	"endDate": "2013-02-01",
+	"progress": 100,
+	"custom_class": "is-achievement",
+	"key": 4,
+	"taskName": 4
+	},
+	{
+	"id": "achievement_4",
+	"name": "title 5",
+	"startDate": "2014-02-01",
+	"endDate": "2015-02-01",
+	"progress": 100,
+	"custom_class": "is-achievement",
+	"key": 5,
+	"taskName": 1
+	},
+	{
+	"id": "achievement_5",
+	"name": "title 6",
+	"startDate": "2010-02-01",
+	"endDate": "2012-02-01",
+	"progress": 100,
+	"custom_class": "is-achievement",
+	"key": 6,
+	"taskName": 4
+	}
+];
+	$(function () {
+		$('.p-timeline__tab').eq(0).addClass('is-active');
+		$('.p-timeline__tab').on('click', function(){
+			const   eleThis = $(this),
+				selectWrap = eleThis.closest('.p-timeline'),
+				selectBtn = selectWrap.find('.p-timeline__tab');
+			selectBtn.removeClass('is-active');
+			eleThis.addClass('is-active');
+
+			const eleIndex = selectBtn.index(this);
+			if (eleIndex == 0) {
+				gantt.view('year').redraw(tasks);
+			} else if (eleIndex == 1) {
+				gantt.view('age').redraw(tasks);
+			}
+
+		});
+		var taskColors = {
+			"1" : "#7ecd00",
+			"2" : "#2456B3",
+			"3" : "#FF9500",
+			"4" : "#FF4334",
+			"5" : "#867979",
+		};
+		var timeParse = d3.timeParse("%Y-%m-%d");
+		tasks.map(function (value, index, array) {
+			let val = value;
+			val.startDate = timeParse(value.startDate);
+			val.endDate = timeParse(value.endDate);
+			return val;
+		});
+		var birthday = 1994;
+		var taskNames = [ "1", "2", "3", "4", "5" ];
+		var gantt = d3.gantt().taskTypes(taskNames).selector('.gantt-chart-d3').birthday(birthday)
+			.view('year').taskColors(taskColors)
+			.onClick(function (d) {
+				openOverLay();
+				$.post(URL.t003.update, { id: d.key}, function(data, status){
+					$('.popup-wrapper').html(data.html);
+				});
+			})(tasks);
+
+	})
+</script>
+</body>
+</html>
